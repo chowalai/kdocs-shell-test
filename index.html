@@ -4,122 +4,103 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="format-detection" content="telephone=no">
-  <title>金山文档 PDF 阅读壳</title>
+  <title>金山文档 PDF 去横幅测试 · 结论</title>
   <style>
-    :root { color-scheme: light; }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #e9edf2; }
-    iframe {
-      display: block; position: fixed; inset: 0;
-      width: 100%; height: 100%; border: 0; background: #e9edf2;
+    :root {
+      color-scheme: light;
+      --ink: #22262e;
+      --muted: #626b78;
+      --line: #e6e2d8;
+      --gold: #c9a063;
+      --gold-dark: #7a5418;
+      --gold-soft: #fbf6ec;
     }
-    #notice {
-      position: fixed; inset: 0; display: none; place-items: center;
-      padding: 28px; box-sizing: border-box; background: #fff;
-      font: 15px/1.7 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
-      color: #3d4653; text-align: center;
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      display: flex; align-items: center; justify-content: center;
+      padding: calc(28px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom));
+      background: linear-gradient(160deg, #f3f1ea 0%, #eceff3 55%, #f6f4ee 100%);
+      color: var(--ink);
+      font: 15px/1.75 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
     }
-    #notice .box { max-width: 420px; }
-    #notice h1 { margin: 0 0 10px; font-size: 17px; font-weight: 600; color: #1f2733; }
-    #notice p { margin: 0 0 18px; }
-    #notice a, #notice button {
-      display: inline-block; padding: 9px 20px; border: 1px solid #c9a063;
-      border-radius: 8px; background: #fbf6ec; color: #7a5418;
-      font-size: 15px; text-decoration: none; cursor: pointer;
+    main {
+      width: 100%; max-width: 680px; padding: 30px 28px 26px;
+      background: #fff; border: 1px solid var(--line); border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(40, 44, 52, .10);
     }
-    #dbg {
-      position: fixed; left: 0; right: 0; bottom: 0; z-index: 9;
-      display: none; padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
-      background: rgba(22, 27, 35, .94); color: #e8edf5;
-      font: 12px/1.6 ui-monospace, Menlo, Consolas, monospace;
-      white-space: pre-wrap; word-break: break-all; max-height: 46vh; overflow: auto;
-      -webkit-user-select: text; user-select: text;
+    .badge {
+      display: inline-block; margin-bottom: 14px; padding: 4px 11px;
+      border: 1px solid #e4cf9f; border-radius: 999px;
+      background: var(--gold-soft); color: var(--gold-dark);
+      font-size: 12px; font-weight: 600; letter-spacing: .04em;
     }
-    #dbg b { color: #e3c07a; font-weight: 600; }
+    h1 { margin: 0 0 10px; font-size: 24px; line-height: 1.35; letter-spacing: -.01em; }
+    .lead { margin: 0 0 22px; color: var(--muted); }
+    ul { margin: 0 0 24px; padding: 0; list-style: none; }
+    li {
+      position: relative; margin: 0 0 12px; padding-left: 20px;
+      color: #39414c;
+    }
+    li::before {
+      content: ""; position: absolute; left: 2px; top: .62em;
+      width: 7px; height: 7px; border-radius: 50%; background: var(--gold);
+    }
+    b { font-weight: 600; color: var(--ink); }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+    .actions a {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 42px; padding: 9px 18px; border-radius: 10px;
+      font-size: 15px; font-weight: 600; text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .primary { background: #1f2733; color: #fff; border: 1px solid #1f2733; }
+    .secondary { background: var(--gold-soft); color: var(--gold-dark); border: 1px solid #e4cf9f; }
+    .foot {
+      margin: 0; padding-top: 16px; border-top: 1px solid #f0ede6;
+      color: #737b86; font-size: 13px; line-height: 1.7;
+    }
+    @media (max-width: 420px) {
+      main { padding: 24px 20px 22px; border-radius: 15px; }
+      h1 { font-size: 21px; }
+      .actions a { flex: 1 1 100%; }
+    }
   </style>
 </head>
 <body>
-  <div id="notice"><div class="box">
-    <h1>文档无法嵌入</h1>
-    <p id="notice-text">这条链接可能已失效，或金山文档限制了嵌入。</p>
-    <a id="fallback" href="#" rel="noopener">在新窗口直接打开</a>
-  </div></div>
-  <pre id="dbg"></pre>
+  <main>
+    <div class="badge">2026-10-17 实测结论</div>
+    <h1>iframe 去横幅方案不可用</h1>
+    <p class="lead">
+      Safari 顶部的 WPS「在 App 中打开」横幅是系统级 Universal Link，
+      不是网页 DOM；网页 CSS / JS 无法移除。
+    </p>
+    <ul>
+      <li><b>原因 1：</b><code>/l/*</code> 在 WPS App 的 AASA 关联列表里，Safari 会直接显示原生横幅。</li>
+      <li><b>原因 2：</b>把文档放进 iframe，会被 WPS SSO 跳到 <code>account.wps.cn</code>；登录型文档最终停在空白页。</li>
+      <li><b>原因 3：</b><code>/office/s/</code> 虽避开 Universal Link，但 kdocs 用 shareId 调 <code>/open/et</code> 报 <code>InvalidArgument</code>，PDF 渲染不出来。</li>
+      <li><b>原因 4：</b>PDF 渲染完成后用 <code>history.replaceState</code> 改 URL，Safari 也不会撤掉已经出现的横幅（iPad 实测）。</li>
+    </ul>
+    <div class="actions">
+      <a id="open-doc" class="primary" href="#" rel="noopener">打开原文档（横幅仍在）</a>
+      <a class="secondary" href="https://gist.github.com/chowalai/e810e406517a8d3c8b53b2303406446f" rel="noopener">查看测试脚本</a>
+    </div>
+    <p class="foot">
+      如果 iPad 不需要 WPS App：设置 → 通用 → iPad 存储空间 → WPS Office → 卸载 App，
+      横幅会随 App 关联一起消失；需要时再从 App Store 装回。
+    </p>
+  </main>
   <script>
     (function () {
-      var DEFAULT_DOC = 'https://www.kdocs.cn/l/cqwhDjLzdMuz?f=301';
-      var params = new URLSearchParams(location.search);
-      var debug = params.get('debug') === '1';
-      var raw = params.get('doc') || DEFAULT_DOC;
-      var notice = document.getElementById('notice');
-      var noticeText = document.getElementById('notice-text');
-      var fallback = document.getElementById('fallback');
-      var dbg = document.getElementById('dbg');
-      var logLines = [];
-
-      function log(label, value) {
-        logLines.push(label + ': ' + value);
-        if (debug) dbg.textContent = logLines.join('\n');
-      }
-
-      function fixDoubleQuestion(url) {
-        var q = url.indexOf('?');
-        if (q < 0) return url;
-        var head = url.slice(0, q + 1);
-        var tail = url.slice(q + 1).replace(/\?/g, '&');
-        return head + tail;
-      }
-
-      function fail(message) {
-        notice.style.display = 'grid';
-        noticeText.textContent = message;
-      }
-
-      var target;
+      var raw = new URLSearchParams(location.search).get('doc') || 'https://www.kdocs.cn/l/cqwhDjLzdMuz?f=301';
+      var q = raw.indexOf('?');
+      if (q >= 0) raw = raw.slice(0, q + 1) + raw.slice(q + 1).replace(/\?/g, '&');
       try {
-        raw = fixDoubleQuestion(raw.trim());
-        target = new URL(raw, location.href);
-        var okHost = /^(?:www\.)?kdocs\.cn$/i.test(target.hostname);
-        var okPath = /^\/(?:l|office)\//i.test(target.pathname);
-        if (target.protocol !== 'https:' || !okHost || !okPath) {
-          throw new Error('只允许 www.kdocs.cn 的 /l/ 或 /office/ 文档链接');
+        var target = new URL(raw, location.href);
+        if (target.protocol === 'https:' && /^www\.kdocs\.cn$/i.test(target.hostname)) {
+          document.getElementById('open-doc').href = target.href;
         }
-      } catch (err) {
-        fail('链接无效：' + err.message);
-        return;
-      }
-
-      fallback.href = target.href;
-      log('top', location.href);
-      log('target', target.href);
-      log('ua', navigator.userAgent);
-      log('viewport', innerWidth + 'x' + innerHeight + ' dpr=' + (devicePixelRatio || 1));
-
-      var frame = document.createElement('iframe');
-      frame.id = 'kdq-shell-frame';
-      frame.src = target.href;
-      frame.allow = 'clipboard-read *; clipboard-write *; fullscreen *; encrypted-media *';
-      frame.referrerPolicy = 'no-referrer-when-downgrade';
-      frame.setAttribute('allowfullscreen', '');
-      document.body.appendChild(frame);
-
-      var started = Date.now();
-      var loadCount = 0;
-      frame.addEventListener('load', function () {
-        loadCount += 1;
-        log('frame load #' + loadCount, (Date.now() - started) + 'ms');
-      });
-
-      setTimeout(function () {
-        log('frame state', 'waited 18s; loads=' + loadCount);
-        if (loadCount >= 3) {
-          fail('文档被跳转到 WPS 登录页，iframe 方式无法显示。请点下方按钮在新窗口打开。');
-        }
-      }, 18000);
-
-      if (debug) {
-        dbg.style.display = 'block';
-        log('debug', 'on');
-      }
+      } catch (err) { /* 默认链接兜底 */ }
     })();
   </script>
 </body>
