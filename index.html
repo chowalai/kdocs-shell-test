@@ -103,16 +103,18 @@
       document.body.appendChild(frame);
 
       var started = Date.now();
+      var loadCount = 0;
       frame.addEventListener('load', function () {
-        log('frame load', (Date.now() - started) + 'ms');
+        loadCount += 1;
+        log('frame load #' + loadCount, (Date.now() - started) + 'ms');
       });
 
       setTimeout(function () {
-        log('frame state', 'waited 12s; check whether the document rendered');
-        if (!logLines.some(function (line) { return line.indexOf('frame load:') === 0; })) {
-          fail('嵌入后 12 秒仍未加载完成。可点下方按钮在顶层打开。');
+        log('frame state', 'waited 18s; loads=' + loadCount);
+        if (loadCount >= 3) {
+          fail('文档被跳转到 WPS 登录页，iframe 方式无法显示。请点下方按钮在新窗口打开。');
         }
-      }, 12000);
+      }, 18000);
 
       if (debug) {
         dbg.style.display = 'block';
